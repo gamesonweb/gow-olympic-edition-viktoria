@@ -75,11 +75,17 @@ export class MainScene{
     // @ts-ignore
 
     const border=MeshBuilder.CreateBox("border", {height: 5, width: 0.5, depth: 60}, this.scene);
-    border.position=new Vector3(1.5,2.5,0);
+    border.position=new Vector3(1.5,2.5,20);
     border.checkCollisions=true;
     const border2=MeshBuilder.CreateBox("border2", {height: 5, width: 0.5, depth: 60}, this.scene);
-    border2.position=new Vector3(-1.5,2.5,0);
+    border2.position=new Vector3(-1.5,2.5,20);
     border2.checkCollisions=true;
+
+    // toit
+    const toit=MeshBuilder.CreateBox("border2", {height: 0.5, width: 3, depth: 60}, this.scene);
+    toit.position=new Vector3(0,5,20);
+    toit.checkCollisions=true;
+
     this.CreateGround();
     
     // créé des obstacle séparé de 3 unité
