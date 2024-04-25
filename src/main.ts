@@ -34,15 +34,6 @@ export class MainScene{
   CreateScene():Scene{
     const scene=new Scene(this.engine);
 
-    /*
-    //mise en place de la gravité
-    const framesPerSecond=100; // j'ai augmenté de 60 à 100 pour qu'il saute moins rapidement
-    const gravity=-9.81; // similaire à la gravité sur terre
-    scene.gravity=new Vector3(0,gravity/framesPerSecond,0);
-
-    
-
-    */
     //sert a enlever la souris quand on joue, si tu click sur la mollette tu peux voir la souris
     
     scene.collisionsEnabled=true; //enable collisions
@@ -83,10 +74,14 @@ export class MainScene{
     light.intensity=0.5;
     // @ts-ignore
 
-    //const ground=MeshBuilder.CreateGround("ground", {width: 3.2, height: 25}, this.scene); // by default it will be created in (0,0,0)
+    const border=MeshBuilder.CreateBox("border", {height: 5, width: 0.5, depth: 60}, this.scene);
+    border.position=new Vector3(1.5,2.5,0);
+    border.checkCollisions=true;
+    const border2=MeshBuilder.CreateBox("border2", {height: 5, width: 0.5, depth: 60}, this.scene);
+    border2.position=new Vector3(-1.5,2.5,0);
+    border2.checkCollisions=true;
     this.CreateGround();
-    //this.CreateBarriere();
-    //this.CreateImpostors();
+    
     // créé des obstacle séparé de 3 unité
     
     for( let i=3; i<20; i+=3){0
@@ -104,7 +99,7 @@ export class MainScene{
   async CreateBarriere():Promise<AbstractMesh>{
     const { meshes} = await SceneLoader.ImportMeshAsync("","./models/", "barriere.glb", this.scene);
     meshes.map((mesh)=>{mesh.checkCollisions=true;});
-    //meshes[0].position=new Vector3(0,0,3);
+    
     return meshes[0];
   }
   
