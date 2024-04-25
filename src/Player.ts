@@ -47,22 +47,7 @@ export class Player{
             mesh.physicsImpostor = new PhysicsImpostor(mesh, PhysicsImpostor.BoxImpostor, { mass: 0, restitution: 0 }, this.scene);
             //mesh.checkCollisions=true;
         });// permet de detecter les collisions
-        /*
-        const radius = 0.5; // Rayon de la capsule
-        const height = 2.0; 
-        const options = {
-        mass: 0.5, // Masse du personnage
-        restitution: 0.9, // Coefficient de restitution
-        shape: {
-            type: PhysicsImpostor.CylinderImpostor,
-            radiusTop: radius,
-            radiusBottom: radius,
-            height: height,
-            orientation: new Vector3(0, 1, 0) // Orientation de la capsule (axe Y)
-        }
-        };
-        this.heroMesh.physicsImpostor = new PhysicsImpostor(this.heroMesh, PhysicsImpostor.CylinderImpostor, options, this.scene);
-        */
+        
         this.camera.lockedTarget=this.heroMesh;
         const neck = new AbstractMesh("", this.scene);
         neck.parent=this.scene.getTransformNodeById("mixamorig:Neck");
@@ -98,7 +83,7 @@ export class Player{
             if(keyInfo.type=== KeyboardEventTypes.KEYDOWN){
                 if ( keyInfo.event.key === " " ){
                     this.isJumping=true;
-                    this.heroMesh.position.y+=0.8;
+                    this.heroMesh.position.y+=1.2;
                     jump.play(false);
                 }
                

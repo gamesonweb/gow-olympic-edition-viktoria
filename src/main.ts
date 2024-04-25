@@ -1,4 +1,4 @@
-import {Scene, Engine, Vector3, HemisphericLight, MeshBuilder, Color4, _staticOffsetValueSize, AmmoJSPlugin, PhysicsImpostor, CannonJSPlugin} from "@babylonjs/core"
+import {Scene, Engine, Vector3, HemisphericLight, MeshBuilder, Color4, _staticOffsetValueSize, AmmoJSPlugin, PhysicsImpostor, CannonJSPlugin, SceneLoader, AbstractMesh} from "@babylonjs/core"
 import {Player} from "./Player";
 import * as CANNON from "cannon";
 
@@ -77,7 +77,7 @@ export class MainScene{
 
   }
   
-  CreateEnvironment():void{
+  async CreateEnvironment():Promise<void>{
     //la lumière
     const light=new HemisphericLight("light", new Vector3(0,1,0),this.scene);// for the lights it doesn't really matter where we place the light, the vector is for the direction it's pointing at
     light.intensity=0.5;
@@ -85,21 +85,29 @@ export class MainScene{
 
     //const ground=MeshBuilder.CreateGround("ground", {width: 3.2, height: 25}, this.scene); // by default it will be created in (0,0,0)
     this.CreateGround();
+    //this.CreateBarriere();
     //this.CreateImpostors();
     // créé des obstacle séparé de 3 unité
+    
     for( let i=3; i<20; i+=3){0
-      const obstacle= MeshBuilder.CreateBox("box", {width: 3, height: 1, depth: 0.1}, this.scene);
+      const obstacle= await this.CreateBarriere();
       obstacle.physicsImpostor=new PhysicsImpostor(obstacle,
         PhysicsImpostor.BoxImpostor, 
         {mass: 0, restitution:0.9}, //restitution bouncing effect
          this.scene);
       obstacle.position=new Vector3(0,0.2,i);
       obstacle.checkCollisions=true;
-
-    }
     
-
+    }
   }
+    
+  async CreateBarriere():Promise<AbstractMesh>{
+    const { meshes} = await SceneLoader.ImportMeshAsync("","./models/", "barriere.glb", this.scene);
+    meshes.map((mesh)=>{mesh.checkCollisions=true;});
+    //meshes[0].position=new Vector3(0,0,3);
+    return meshes[0];
+  }
+  
   
   CreateImpostors():void{
     const box=MeshBuilder.CreateBox("box", {size:2}, this.scene);
