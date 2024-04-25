@@ -1,7 +1,7 @@
-import { Scene, Engine, SceneLoader, AnimationGroup, KeyboardEventTypes, ActionManager, ExecuteCodeAction, Vector3, AbstractMesh, FollowCamera} from "@babylonjs/core";
+import { Scene, Engine, SceneLoader, AnimationGroup, KeyboardEventTypes, ActionManager, ExecuteCodeAction, Vector3, AbstractMesh, FollowCamera, PhysicsImpostor} from "@babylonjs/core";
 import "@babylonjs/loaders";
-//import '@babylonjs/inspector';
-//import { Inspector } from "@babylonjs/inspector";
+import '@babylonjs/inspector';
+import { Inspector } from "@babylonjs/inspector";
 
 export class Player{
     scene:Scene;
@@ -27,7 +27,7 @@ export class Player{
     }
     
     async CreateCharacter(): Promise<void>{
-
+        
         // recuperer les meshes pour pouvoir se déplacer
         // les animationGroups pour pouvoir changer d'animation
         const inputMap: { [id: string] : boolean} = {}
@@ -42,31 +42,63 @@ export class Player{
         const { meshes, animationGroups} = await SceneLoader.ImportMeshAsync("","./models/", "character.glb", this.scene);
         
         this.heroMesh=meshes[0];
+        
+        meshes.map((mesh)=>{
+            mesh.physicsImpostor = new PhysicsImpostor(mesh, PhysicsImpostor.BoxImpostor, { mass: 0, restitution: 0 }, this.scene);
+            //mesh.checkCollisions=true;
+        });// permet de detecter les collisions
+        /*
+        const radius = 0.5; // Rayon de la capsule
+        const height = 2.0; 
+        const options = {
+        mass: 0.5, // Masse du personnage
+        restitution: 0.9, // Coefficient de restitution
+        shape: {
+            type: PhysicsImpostor.CylinderImpostor,
+            radiusTop: radius,
+            radiusBottom: radius,
+            height: height,
+            orientation: new Vector3(0, 1, 0) // Orientation de la capsule (axe Y)
+        }
+        };
+        this.heroMesh.physicsImpostor = new PhysicsImpostor(this.heroMesh, PhysicsImpostor.CylinderImpostor, options, this.scene);
+        */
         this.camera.lockedTarget=this.heroMesh;
-        const toto = new AbstractMesh("", this.scene);
-        toto.parent=this.scene.getTransformNodeById("mixamorig:Neck");
-        this.camera.lockedTarget=toto;
+        const neck = new AbstractMesh("", this.scene);
+        neck.parent=this.scene.getTransformNodeById("mixamorig:Neck");
+        this.camera.lockedTarget=neck;
+        // Hauteur de la capsule (approximativement la hauteur du personnage)
+
+        
+        //this.heroMesh.physicsImpostor = new PhysicsImpostor(this.heroMesh, PhysicsImpostor.BoxImpostor, { mass: 0.5, restitution: 0.9 }, this.scene);
+        this.heroMesh.checkCollisions=true;
         console.log(meshes);
         this.characterAnim=animationGroups;
 
-        this.heroMesh.position= new Vector3(0,0.2,-1);
+        this.heroMesh.position= new Vector3(0,0,-1);
         const heroRotationSpeed=0.05
         const heroSpeed = 0.2;
         const heroSpeedBackwards = 0.2;
         const jump= animationGroups[0];
         const run=animationGroups[1];
         console.log("dans player "+this.heroMesh);
-        this.heroMesh.ellipsoid=new Vector3(1,0.2,0.5);
+
+
+        
+
+        //this.heroMesh.ellipsoid=new Vector3(1,0.2,0.5);
         jump.stop(); //arrete l'animation
         run.play(true); //demare l'animation, true pour loop l'animation
         
         
 
         this.scene.onKeyboardObservable.add((keyInfo)=>{
+            if(!this.isJumping && this.heroMesh.position.y>=0.01) {this.heroMesh.position.y=0;}
             console.log(this.heroMesh.position);
             if(keyInfo.type=== KeyboardEventTypes.KEYDOWN){
                 if ( keyInfo.event.key === " " ){
-            
+                    this.isJumping=true;
+                    this.heroMesh.position.y+=0.8;
                     jump.play(false);
                 }
                
@@ -74,11 +106,13 @@ export class Player{
             }
             else if(keyInfo.type=== KeyboardEventTypes.KEYUP){
                 if ( keyInfo.event.key === " " ){
+                    this.isJumping=false;
                     run.play(true);
+
                 }
             }
         })
-        var times=0;
+        
         this.scene.onBeforeRenderObservable.add(() => {
             // @ts-ignore
             let keydown = false;
@@ -104,17 +138,8 @@ export class Player{
                 keydown = true;
                 this.rotation++;
             }
-            /*
-            if (inputMap["i"]) {
-                if(times%2!=0){
-                    Inspector.Show(this.scene, {});
-                }
-                else{
-                    Inspector.Hide();
-                }
-                times++;
-            }
-            */
+            
+            
             
             
             
@@ -129,10 +154,7 @@ export class Player{
         camera.rotationOffset = 180; // the goal angle in degrees arount the target in the x,y plan
         camera.cameraAcceleration = 0.005;
         camera.maxCameraSpeed = 5;
-        
-        //camera.attachControl(true);
-        //camera.lockedTarget = this.heroMesh;
-        //console.log("dans main: "+this.heroMesh);
+
         return camera;
       }     
     
