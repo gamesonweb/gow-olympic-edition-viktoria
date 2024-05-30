@@ -98,13 +98,13 @@ export class Player{
                
                 
             }
-            else if(keyInfo.type=== KeyboardEventTypes.KEYUP){
-                if ( keyInfo.event.key === " " ){
+            else {
+        
                     this.isJumping=false;
                     run.play(true);
 
                 }
-            }
+            
         })
         
         let iPressedLastFrame = false; // Variable pour suivre si la touche "i" était enfoncée lors de la dernière frame
