@@ -55,7 +55,7 @@ export class MainScene{
    
   }
   CreateGround():void{
-    const ground=MeshBuilder.CreateGround("ground", {width: 3, height: 25}, this.scene); // by default it will be created in (0,0,0)
+    const ground=MeshBuilder.CreateGround("ground", {width: 3, height: 100}, this.scene); // by default it will be created in (0,0,0)
     ground.position=new Vector3(0,0,10);
 
     ground.physicsImpostor=new PhysicsImpostor(ground, 
@@ -90,7 +90,7 @@ export class MainScene{
     
     // créé des obstacle séparé de 3 unité
     
-    for( let i=3; i<20; i+=5){0
+    for( let i=3; i<50; i+=5){0
       const obstacle= await this.CreateBarriere();
       obstacle.physicsImpostor=new PhysicsImpostor(obstacle,
         PhysicsImpostor.BoxImpostor, 

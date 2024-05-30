@@ -88,11 +88,14 @@ export class Player{
         
             if(!this.isJumping && this.heroMesh.position.y>=0.01) {this.heroMesh.position.y=0;}
             console.log(this.heroMesh.position);
+            if(this.heroMesh.position.z>=55){
+                alert("Vous avez gagné, fin du jeu");
+            }
             if(keyInfo.type=== KeyboardEventTypes.KEYDOWN){
                 if ( keyInfo.event.key === " " ){
                     this.isJumping=true;
                     this.heroMesh.position.y+=1.5;
-                    this.heroMesh.position.z+=1;
+                    this.heroMesh.position.z+=0.5;
                     jump.play(false);
                 }
                
