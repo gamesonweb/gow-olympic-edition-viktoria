@@ -44,7 +44,7 @@ export class MainScene{
     
     
     // la couleur bleue du ciel
-    scene.clearColor = new Color4(0.4, 0.6, 0.8);
+    
 
 
     //pour la physique
@@ -55,7 +55,7 @@ export class MainScene{
    
   }
   CreateGround():void{
-    const ground=MeshBuilder.CreateGround("ground", {width: 3.2, height: 25}, this.scene); // by default it will be created in (0,0,0)
+    const ground=MeshBuilder.CreateGround("ground", {width: 3, height: 25}, this.scene); // by default it will be created in (0,0,0)
     ground.position=new Vector3(0,0,10);
 
     ground.physicsImpostor=new PhysicsImpostor(ground, 
@@ -72,25 +72,25 @@ export class MainScene{
     //la lumière
     const light=new HemisphericLight("light", new Vector3(0,1,0),this.scene);// for the lights it doesn't really matter where we place the light, the vector is for the direction it's pointing at
     light.intensity=0.5;
-    // @ts-ignore
-
+    
+    /*
     const border=MeshBuilder.CreateBox("border", {height: 5, width: 0.5, depth: 60}, this.scene);
     border.position=new Vector3(1.5,2.5,20);
     border.checkCollisions=true;
     const border2=MeshBuilder.CreateBox("border2", {height: 5, width: 0.5, depth: 60}, this.scene);
     border2.position=new Vector3(-1.5,2.5,20);
     border2.checkCollisions=true;
-
+    
     // toit
     const toit=MeshBuilder.CreateBox("border2", {height: 0.5, width: 3, depth: 60}, this.scene);
     toit.position=new Vector3(0,5,20);
     toit.checkCollisions=true;
-
+    */
     this.CreateGround();
     
     // créé des obstacle séparé de 3 unité
     
-    for( let i=3; i<20; i+=3){0
+    for( let i=3; i<20; i+=5){0
       const obstacle= await this.CreateBarriere();
       obstacle.physicsImpostor=new PhysicsImpostor(obstacle,
         PhysicsImpostor.BoxImpostor, 
@@ -110,7 +110,7 @@ export class MainScene{
   }
   
   
-  CreateImpostors():void{
+  CreateImposters():void{
     const box=MeshBuilder.CreateBox("box", {size:2}, this.scene);
     box.position=new Vector3(0,5,10);
     box.physicsImpostor=new PhysicsImpostor(box,

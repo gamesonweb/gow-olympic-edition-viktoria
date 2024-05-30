@@ -1,4 +1,4 @@
-import { Scene, Engine, SceneLoader, AnimationGroup, KeyboardEventTypes, ActionManager, ExecuteCodeAction, Vector3, AbstractMesh, FollowCamera, PhysicsImpostor} from "@babylonjs/core";
+import { Scene, Engine, SceneLoader, AnimationGroup, KeyboardEventTypes, ActionManager, ExecuteCodeAction, Vector3, AbstractMesh, FollowCamera, PhysicsImpostor, MeshBuilder} from "@babylonjs/core";
 import "@babylonjs/loaders";
 import '@babylonjs/inspector';
 import { Inspector } from "@babylonjs/inspector";
@@ -11,17 +11,18 @@ export class Player{
     rotation: number;
     heroMesh: AbstractMesh;
     camera: FollowCamera;
-    // @ts-ignore
+    
+    
     constructor(canvas: HTMLCanvasElement, scene: Scene, engine: Engine){
         
         this.scene=scene;
-        Inspector.Show(scene, {});
+        
         this.engine=engine;
         this.isJumping=false;
         this.characterAnim=[];
         this.rotation=0;
         this.heroMesh=new AbstractMesh("");
-        this.CreateCharacter();
+        this.CreateCharacter(); 
         this.camera=this.CreateFollowCamera();
         
     }
@@ -39,7 +40,7 @@ export class Player{
             inputMap[evt.sourceEvent.key] = false;
         }));
 
-        const { meshes, animationGroups} = await SceneLoader.ImportMeshAsync("","./models/", "grandma.glb", this.scene);
+        const { meshes, animationGroups} = await SceneLoader.ImportMeshAsync("","./models/", "character.glb", this.scene);
         
         this.heroMesh=meshes[0];
         console.log(animationGroups);
@@ -54,7 +55,12 @@ export class Player{
         this.camera.lockedTarget=neck;
         // Hauteur de la capsule (approximativement la hauteur du personnage)
 
-        
+        //const box= MeshBuilder.CreateBox("box", {height:1.5, width:0.5, depth:0.5 }, this.scene);
+        //change the color of box to red
+
+
+        //box.position=new Vector3(0,0.75,-1);
+        //box.physicsImpostor = new PhysicsImpostor(box, PhysicsImpostor.BoxImpostor, { mass: 0.5, restitution: 0.5 }, this.scene);
         //this.heroMesh.physicsImpostor = new PhysicsImpostor(this.heroMesh, PhysicsImpostor.BoxImpostor, { mass: 0.5, restitution: 0.9 }, this.scene);
         this.heroMesh.checkCollisions=true;
         console.log(meshes);
@@ -64,9 +70,9 @@ export class Player{
         this.heroMesh.position= new Vector3(0,0,-1);
         const heroRotationSpeed=0.05
         const heroSpeed = 0.2;
-        const heroSpeedBackwards = 0.2;
-        const jump= animationGroups[2];
-        const run=animationGroups[3];
+        //const heroSpeedBackwards = 0.2;
+        const jump= animationGroups[0];
+        const run=animationGroups[1];
         console.log("dans player "+this.heroMesh);
 
 
@@ -79,12 +85,14 @@ export class Player{
         
 
         this.scene.onKeyboardObservable.add((keyInfo)=>{
-            //if(!this.isJumping && this.heroMesh.position.y>=0.01) {this.heroMesh.position.y=0;}
+        
+            if(!this.isJumping && this.heroMesh.position.y>=0.01) {this.heroMesh.position.y=0;}
             console.log(this.heroMesh.position);
             if(keyInfo.type=== KeyboardEventTypes.KEYDOWN){
                 if ( keyInfo.event.key === " " ){
                     this.isJumping=true;
-                    //this.heroMesh.position.y+=1.2;
+                    this.heroMesh.position.y+=1.5;
+                    this.heroMesh.position.z+=1;
                     jump.play(false);
                 }
                
@@ -99,39 +107,46 @@ export class Player{
             }
         })
         
+        let iPressedLastFrame = false; // Variable pour suivre si la touche "i" était enfoncée lors de la dernière frame
+        let inspectorVisible = false; // Variable pour suivre l'état actuel de l'inspecteur
+        let cpt=0
         this.scene.onBeforeRenderObservable.add(() => {
-            // @ts-ignore
             let keydown = false;
-            
-            
-            
-            if (inputMap["w"]||inputMap["z"]) {
+
+            if (inputMap["w"] || inputMap["z"]) {
                 this.heroMesh.moveWithCollisions(this.heroMesh.forward.scaleInPlace(heroSpeed));
                 keydown = true;
+            }
             
-            }
-            if (inputMap["s"]) {
-                this.heroMesh.moveWithCollisions(this.heroMesh.forward.scaleInPlace(-heroSpeedBackwards));
+            if (inputMap["i"] && !iPressedLastFrame) { // Vérifie si la touche "i" est enfoncée et si elle n'était pas enfoncée la dernière frame
+                if (inspectorVisible) {
+                    Inspector.Hide(); // Cache l'inspector si déjà visible
+                    inspectorVisible = false;
+                } else {
+                    Inspector.Show(this.scene, {}); // Affiche l'inspector
+                    inspectorVisible = true;
+                }
                 keydown = true;
+                iPressedLastFrame = true;
+            } else if (!inputMap["i"]) { // Si la touche "i" n'est pas enfoncée dans cette frame
+                iPressedLastFrame = false; // Réinitialise la variable
             }
-            if (inputMap["a"]||inputMap["q"]) {
+            /*
+            if (inputMap["a"] || inputMap["q"]) {
                 this.heroMesh.rotate(Vector3.Up(), -heroRotationSpeed);
                 keydown = true;
                 this.rotation--;
             }
+            
             if (inputMap["d"]) {
                 this.heroMesh.rotate(Vector3.Up(), heroRotationSpeed);
                 keydown = true;
                 this.rotation++;
             }
             
-            
-            
-            
-            
-            
-        }
-        );
+            */
+                // Si aucune des touches n'a été enfoncée, keydown restera à false
+        });
     }
     CreateFollowCamera(): FollowCamera{
         const camera= new FollowCamera("followCam",new Vector3(0, 4.2, -1), this.scene);
